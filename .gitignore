@@ -1,0 +1,10 @@
+# Here is comment.
+
+# ignore folder
+
+Debug/
+Release/
+
+
+# ignore files
+.exe
