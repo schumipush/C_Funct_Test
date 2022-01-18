@@ -306,6 +306,46 @@ extern double time2doy(gtime_t t)
 
 // ============================ test ===================================
 
+void time_out(gtime_t time){
+    char *str_t;
+    double doy,sod,ep[6],sec;
+    int week,year;
+
+    // ============================ 输出 ===================================
+    printf("\n各种格式的时间：");
+    // 输出gtime_t
+    printf("\n\n✅ gtime_t: time=%ld sec=%.2f",time.time,time.sec);
+
+    // 输出字符串
+    str_t = time_str(time,1);
+    printf("\n\n✅ 字符串格式：%s",str_t);
+
+    // 输出6元数组
+    time2epoch(time,ep);
+    printf("\n\n✅ 6元数组：ep[]=[%4d, %2d, %2d, %2d, %2d, %5.2f]",(int)ep[0],
+        (int)ep[1],(int)ep[2],(int)ep[3],(int)ep[4],ep[5]);
+    
+    // 输出年积日
+    gtime_t time_temp;
+    doy = time2doy(time);
+    sod = time2sec(time,&time_temp);
+    time2epoch(time_temp,ep);
+    printf("\n\n✅ 年积日： year=%4d doy=%03d sod=%.2f",(int)ep[0],(int)doy,sod);
+
+    // 输出gpst
+    time_temp = utc2gpst(time);
+    sec = time2gpst(time_temp,&week);
+    printf("\n\n✅ GPS时间：week=%d sec=%.2f",week,sec);
+
+    // 输出bdt
+    time_temp = utc2gpst(time);
+    time_temp = gpst2bdt(time_temp);
+    sec = time2bdt(time_temp,&week);
+    printf("\n\n✅ 北斗时间：week=%d sec=%.2f",week,sec);
+
+    printf("\n\n");
+}
+
 int main(int argc, char* argv[]){
     
     // ============================ 输入 ===================================
@@ -329,7 +369,7 @@ int main(int argc, char* argv[]){
     #endif
 
     // 3. 输入6元数组utc
-    #if 1
+    #if 0
     double e[6] = {2022, 8, 2, 12, 52, 10.6};
         memcpy(ep,e,sizeof(double)*6);
         time = epoch2time(ep);
@@ -365,40 +405,19 @@ int main(int argc, char* argv[]){
     time = gpst2utc(time); // 变为utc
     #endif
 
-    // ============================ 输出 ===================================
-    printf("\n各种格式的时间：");
-    // 输出gtime_t
-    printf("\n\n✅ gtime_t: time=%ld sec=%.2f",time.time,time.sec);
-
-    // 输出字符串
-    str_t = time_str(time,1);
-    printf("\n\n✅ 字符串格式：%s",str_t);
-
-    // 输出6元数组
-    time2epoch(time,ep);
-    printf("\n\n✅ 6元数组：ep[]=[%4d, %2d, %2d, %2d, %2d, %5.2f]",(int)ep[0],
-        (int)ep[1],(int)ep[2],(int)ep[3],(int)ep[4],ep[5]);
-    
-    // 输出年积日
-    gtime_t time_temp;
-    doy = time2doy(time);
-    sod = time2sec(time,&time_temp);
-    time2epoch(time_temp,ep);
-    printf("\n\n✅ 年积日： year=%4d doy=%03d sod=%.2f",(int)ep[0],(int)doy,sod);
-
-    // 输出gpst
-    time_temp = utc2gpst(time);
-    sec = time2gpst(time_temp,&week);
-    printf("\n\n✅ GPS时间：week=%d sec=%.2f",week,sec);
-
-    // 输出bdt
-    time_temp = utc2gpst(time);
-    time_temp = gpst2bdt(time_temp);
-    sec = time2bdt(time_temp,&week);
-    printf("\n\n✅ 北斗时间：week=%d sec=%.2f",week,sec);
-
+    // 从命令行输入
+    #if 1
+    while(1){
+        printf("===========================================");
+        printf("\n请输入一个时间（如 2022 1 1 0 0 0）：");
+        scanf("%lf %lf %lf %lf %lf %lf",ep,ep+1,ep+2,ep+3,ep+4,ep+5);
+        time = epoch2time(ep);
+        time_out(time);
+    }
+    #else
+        time_out(time);
+    #endif
 
     
-    printf("\n\n");
     return 0;
 }
